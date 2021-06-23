@@ -1,7 +1,7 @@
 ## How to authenticate a user and use a different role
 
-[Blog post](https://neonmirrors.net/post/2019-10/authentication-and-authorization-in-k8s/)
-[Kubernetes CSR doc](https://kubernetes.io/docs/reference/access-authn-authz/certificate-signing-requests/)
+- [Great blog post](https://neonmirrors.net/post/2019-10/authentication-and-authorization-in-k8s/)
+- [Kubernetes CSR doc](https://kubernetes.io/docs/reference/access-authn-authz/certificate-signing-requests/)
 
 ### All in one steps
 
