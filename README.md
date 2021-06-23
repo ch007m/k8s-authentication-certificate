@@ -9,7 +9,13 @@ Execute this bash script to perform all the steps to create a certificate for a 
 credentials, context and kubeconfig file
 
 ```bash
-./
+./generate-user-certificate.sh
+```
+
+Next, you can test/play different scenario where the user has the role `ADMIN` only !!
+
+```bash
+./play.sh
 ```
 
 ### Manual steps
