@@ -3,7 +3,16 @@
 [Blog post](https://neonmirrors.net/post/2019-10/authentication-and-authorization-in-k8s/)
 [Kubernetes CSR doc](https://kubernetes.io/docs/reference/access-authn-authz/certificate-signing-requests/)
 
-### Steps
+### All in one steps
+
+Execute this bash script to perform all the steps to create a certificate for a user `snowdrop`, sign it and next set up the 
+credentials, context and kubeconfig file
+
+```bash
+./
+```
+
+### Manual steps
 
 - Create a private key and Certificate request
 ```bash
@@ -33,4 +42,6 @@ EOF
 kubectl certificate approve snowdrop
 kubectl get csr snowdrop -o jsonpath='{.status.certificate}' | base64 -d > snowdrop.crt
 ```
+
+TODO: Detail all the steps
 

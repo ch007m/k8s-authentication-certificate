@@ -10,6 +10,7 @@ rm snowdrop.*; rm snowdrop-kubeconfig; rm $CA
 
 ### Remove the CSR generated previously
 kubectl delete csr $USERNAME
+kubectl delete clusterrolebinding $USERNAME
 kubectl delete ns $NAMESPACE
 
 ####
@@ -43,15 +44,14 @@ kubectl create ns $NAMESPACE
 ### Assign a role to the user
 ### Assign the role to the user
 cat <<EOF | kubectl apply --namespace=$NAMESPACE -f -
-kind: RoleBinding
+kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  name: developer-admin
+  name: $USERNAME-admin
 subjects:
 - kind: User
   name: $USERNAME
   apiGroup: rbac.authorization.k8s.io
-  namespace: $NAMESPACE
 roleRef:
   kind: ClusterRole
   name: admin
@@ -85,3 +85,5 @@ kubectl --kubeconfig=$USERNAME-kubeconfig config use-context $USERNAME-$NAMESPAC
 #### Get some pods
 echo "kubectl --kubeconfig=$USERNAME-kubeconfig get pods"
 kubectl --kubeconfig=$USERNAME-kubeconfig get pods
+#### Get all the pods - Will fail as user is not Cluster scoped
+kubectl --kubeconfig=$USERNAME-kubeconfig get pods -A
