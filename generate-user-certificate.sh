@@ -1,13 +1,16 @@
 #!/bin/bash
 export USERNAME="snowdrop"
 export NAMESPACE="demo"
-export CA=/etc/kubernetes/pki/ca.crt
+export CA=CA.crt
 export CLUSTER=kind-kind
 export CLUSTER_SERVER=https://127.0.0.1:59817
 
-####
 #### Remove the generated files
-rm snowdrop.*; rm snowdrop-kubeconfig
+rm snowdrop.*; rm snowdrop-kubeconfig; rm $CA
+
+### Remove the CSR generated previously
+kubectl delete csr $USERNAME
+kubectl delete ns $NAMESPACE
 
 ####
 #### Generate private key
@@ -55,6 +58,10 @@ roleRef:
   apiGroup: rbac.authorization.k8s.io
 EOF
 
+### Get the CA certificate file
+echo "### Get the Kind kubernetes CA certificate file"
+docker exec -it kind-control-plane cat /etc/kubernetes/pki/ca.crt > $CA
+
 #### Create the credential object and output the new kubeconfig file
 echo "## Create the credential object and output the new kubeconfig file"
 echo "kubectl --kubeconfig=$USERNAME-kubeconfig config set-credentials $USERNAME --client-certificate=$USERNAME.crt --client-key=$USERNAME.key --embed-certs"
@@ -64,7 +71,6 @@ kubectl --kubeconfig=$USERNAME-kubeconfig config set-credentials $USERNAME --cli
 echo "Set the cluster info"
 echo "kubectl --kubeconfig=$USERNAME-kubeconfig config set-cluster $CLUSTER --server=$CLUSTER_SERVER --certificate-authority=$CA --embed-certs"
 kubectl --kubeconfig=$USERNAME-kubeconfig config set-cluster $CLUSTER --server=$CLUSTER_SERVER --certificate-authority=$CA --embed-certs
-# ERROR: error: could not stat certificate-authority file /etc/kubernetes/pki/ca.crt: stat /etc/kubernetes/pki/ca.crt: no such file or directory
 
 #### Set the context
 echo "Set the context"
@@ -75,3 +81,7 @@ kubectl --kubeconfig=$USERNAME-kubeconfig config set-context $USERNAME-$NAMESPAC
 echo "Use the context"
 echo "kubectl --kubeconfig=$USERNAME-kubeconfig config use-context $USERNAME-$NAMESPACE-$CLUSTER"
 kubectl --kubeconfig=$USERNAME-kubeconfig config use-context $USERNAME-$NAMESPACE-$CLUSTER
+
+#### Get some pods
+echo "kubectl --kubeconfig=$USERNAME-kubeconfig get pods"
+kubectl --kubeconfig=$USERNAME-kubeconfig get pods
