@@ -56,11 +56,17 @@ roleRef:
 EOF
 
 #### Create the credential object and output the new kubeconfig file
+echo "Create the credential object and output the new kubeconfig file"
 kubectl --kubeconfig=$USERNAME-kubeconfig config set-credentials $USERNAME --client-certificate=$USERNAME.crt --client-key=$USERNAME.key --embed-certs
 #### Set the cluster info
+echo "Set the cluster info"
 kubectl --kubeconfig=$USERNAME-kubeconfig config set-cluster $CLUSTER --server=$CLUSTER_SERVER --certificate-authority=$CA --embed-certs
+# ERROR: error: could not stat certificate-authority file /etc/kubernetes/pki/ca.crt: stat /etc/kubernetes/pki/ca.crt: no such file or directory
+
 #### Set the context
+echo "Set the context"
 kubectl --kubeconfig=$USERNAME-kubeconfig config set-context $USERNAME-$NAMESPACE-$CLUSTER --user=$USERNAME --cluster=$CLUSTER --namespace=$NAMESPACE
 
 #### Use the context
+echo "Use the context"
 kubectl --kubeconfig=$USERNAME-kubeconfig config use-context $USERNAME-$NAMESPACE-$CLUSTER
