@@ -10,7 +10,7 @@ rm snowdrop.*; rm snowdrop-kubeconfig; rm $CA
 
 ### Remove the CSR generated previously
 kubectl delete csr $USERNAME
-kubectl delete clusterrolebinding $USERNAME
+kubectl delete rolebinding $USERNAME -n $NAMESPACE
 kubectl delete ns $NAMESPACE
 
 ####
@@ -44,10 +44,11 @@ kubectl create ns $NAMESPACE
 ### Assign a role to the user
 ### Assign the role to the user
 cat <<EOF | kubectl apply --namespace=$NAMESPACE -f -
-kind: ClusterRoleBinding
+kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: $USERNAME-admin
+  namespace: $NAMESPACE
 subjects:
 - kind: User
   name: $USERNAME
@@ -83,7 +84,15 @@ echo "kubectl --kubeconfig=$USERNAME-kubeconfig config use-context $USERNAME-$NA
 kubectl --kubeconfig=$USERNAME-kubeconfig config use-context $USERNAME-$NAMESPACE-$CLUSTER
 
 #### Get some pods
-echo "kubectl --kubeconfig=$USERNAME-kubeconfig get pods"
-kubectl --kubeconfig=$USERNAME-kubeconfig get pods
-#### Get all the pods - Will fail as user is not Cluster scoped
-kubectl --kubeconfig=$USERNAME-kubeconfig get pods -A
+kubectl --kubeconfig=$USERNAME-kubeconfig get pods -n $NAMESPACE
+
+### Should see a rolebinding
+kubectl --kubeconfig=$USERNAME-kubeconfig -n $NAMESPACE get rolebinding
+
+#### Should get YES as we see pods within the namespace $NAMESPACE
+kubectl auth can-i get pods --as $USERNAME --namespace $NAMESPACE
+
+#### Should get NO as we cannot see the pods under the namespace kube-system
+kubectl auth can-i get po --as $USERNAME --namespace kube-system
+
+
